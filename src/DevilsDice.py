@@ -23,6 +23,7 @@ myTurn = True
 myPts = 0
 devilsPts = 0
 
+
 def drawBoard(my_score, devils_score):
     # draw score increments of 10
     font = pygame.font.SysFont(None, 48)
@@ -42,16 +43,18 @@ def drawBoard(my_score, devils_score):
     dis.blit(devil, (devil_x, y))
 
     # draw buttons
-    roll = Button(dis, LIGHT_GREY, dis_width / 2 - 15, dis_height / 2, 100, 50, "roll")
-    roll.draw()
-    roll.add_text("Roll", 48, BLACK)
+    roll_die = Button(dis, LIGHT_GREY, dis_width / 2 - 15, dis_height / 2, 100, 50, "roll")
+    roll_die.draw()
+    roll_die.add_text("Roll", 48, BLACK)
     pass_turn = Button(dis, LIGHT_GREY, dis_width / 2 - 15, dis_height / 2 + dis_height / 10, 100, 50, "pass")
     pass_turn.draw()
     pass_turn.add_text("Pass", 48, BLACK)
 
     # draw player score bars
-    pygame.draw.rect(dis, BLUE, [my_x, dis_height - ((dis_height / 10) * (my_score / 10)), dis_width / 10, (dis_height / 10) * (my_score / 10) - 30])
-    pygame.draw.rect(dis, DARK_RED, [devil_x, dis_height - ((dis_height / 10) * (devils_score / 10)), dis_width / 10, (dis_height / 10) * (devils_score / 10) - 30])
+    pygame.draw.rect(dis, BLUE, [my_x, dis_height - ((dis_height / 10) * (my_score / 10)), dis_width / 10,
+                                 (dis_height / 10) * (my_score / 10) - 30])
+    pygame.draw.rect(dis, DARK_RED, [devil_x, dis_height - ((dis_height / 10) * (devils_score / 10)), dis_width / 10,
+                                     (dis_height / 10) * (devils_score / 10) - 30])
 
 
 running = True
@@ -62,20 +65,32 @@ while running:
 
     myRndPts = 0
     while myTurn:
-        selection = input("Roll: 'r', Pass: 'p'")
-        if selection == 'r':
+        drawBoard(myPts, devilsPts)
+        pygame.display.update()
+        clicked = pygame.mouse.get_pressed()
+        response = input("Roll: 'r' or Pass 'p': ")
+        if response == 'r':
             die = random.randint(1, 6)
             if die == 1:
+                print("You rolled a 1")
                 myTurn = False
+                break
             myRndPts += die
-        elif selection == 'p':
+            print(f"You rolled a {die}. You're current round score is {myRndPts}")
+        elif response == 'p':
+            print(f"You just cashed in {myRndPts}!")
             myPts += myRndPts
             myTurn = False
-    drawBoard(myPts, devilsPts)
+        drawBoard(myPts, devilsPts)
+        pygame.display.update()
+        if myPts >= 100:
+            print(f"You win with a score of {myPts}")
+            running = False
+            break
 
     devilsRndPts = 0
     while not myTurn:
-        if devilsPts < myPts:
+        if devilsPts <= myPts:
             if devilsRndPts < 30:
                 roll = random.randint(1, 6)
                 if roll == 1:
@@ -85,7 +100,7 @@ while running:
                 devilsPts += devilsRndPts
                 myTurn = True
         else:
-            if devilsPts < 21:
+            if devilsRndPts < 21:
                 roll = random.randint(1, 6)
                 if roll == 1:
                     myTurn = True
@@ -93,9 +108,9 @@ while running:
             else:
                 devilsPts += devilsRndPts
                 myTurn = True
-
-
-
-
+        if devilsPts >= 100:
+            print(f"The devil wins with a score of {devilsPts}")
+            running = False
+            break
 
 pygame.quit()
